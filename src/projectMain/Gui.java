@@ -100,11 +100,14 @@ public class Gui extends JFrame implements ActionListener {
 
 	private JPanel createCompressorPanel(final Compressor c)
 	{
-		JPanel panel = new ComponentPanel(c.NAME, 1, 3, this); 
+		JPanel panel = new ComponentPanel(c.NAME, 2, 3, this); 
 
 		panel.add(new SliderPanel(c.getThreshold(), DEFAULT_SLIDER_GRAINS, this)); 
 		panel.add(new SliderPanel(c.getRatio(), DEFAULT_SLIDER_GRAINS, this)); 
 		panel.add(new SliderPanel(c.getGain(), DEFAULT_SLIDER_GRAINS, this)); 
+		
+		panel.add(new SliderPanel(c.getAttack(), DEFAULT_SLIDER_GRAINS, this)); 
+		panel.add(new SliderPanel(c.getRelease(), DEFAULT_SLIDER_GRAINS, this)); 
 
 		return panel; 
 	}

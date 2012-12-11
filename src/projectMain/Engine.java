@@ -38,8 +38,10 @@ public class Engine {
 		/*Compressor*/
 		final Parameter<Double> compThreshold = new Parameter<Double>(Double.class, 0.0, 1.0, 1.0, "Threshold");
 		final Parameter<Double> compRatio = new Parameter<Double> (Double.class, 1.0, 100.0, 2.0, "Ratio", 6);
-		final Parameter<Double> compGain = new Parameter<Double> (Double.class, 1.0, 4.0, 1.0, "Gain"); 		
-		this.compressor1 = new Compressor("Compressor 1", compThreshold, compRatio, compGain); 
+		final Parameter<Double> compGain = new Parameter<Double> (Double.class, 1.0, 4.0, 1.0, "Gain");
+		final Parameter<Double> compAttack = new Parameter<Double>(Double.class, 0.0, 1.0, 0.0, "Attack");
+		final Parameter<Double> compRelease = new Parameter<Double>(Double.class, 0.0, 1.0, 0.0, "Release"); 
+		this.compressor1 = new Compressor("Compressor 1", compThreshold, compRatio, compGain, compAttack, compRelease); 
 				
 		/*Redux*/
 		final Parameter<Double> reduxSampleRate = new Parameter<Double>(Double.class, 2.0, (double)sampleRate, (double)sampleRate, "Sample Rate", 5); 

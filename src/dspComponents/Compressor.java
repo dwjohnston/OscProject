@@ -14,17 +14,25 @@ public class Compressor extends Component {
 	private Parameter<Double> threshold;
 	private Parameter<Double> gain; 
 	private Parameter<Double> ratio;
-			
+	
+	private Parameter<Double> attack;
+	private Parameter<Double> release; 
+	
+	public Parameter<Double> getAttack() {return this.attack;}
+	public Parameter<Double> getRelease() {return this.release;}
+	
 	public Parameter<Double> getThreshold()			{return this.threshold;}
 	public Parameter<Double> getGain() 				{return this.gain; }
 	public  Parameter<Double> getRatio() 				{return this.ratio; }
 	
-	public Compressor(String name, Parameter<Double> threshold, Parameter<Double> ratio, Parameter<Double> gain)
+	public Compressor(String name, Parameter<Double> threshold, Parameter<Double> ratio, Parameter<Double> gain, Parameter<Double> attack, Parameter<Double> release)
 	{
 		super(name); 
 		this.threshold = threshold; 
 		this.ratio = ratio; 
 		this.gain = gain;
+		this.attack = attack;
+		this.release = release; 
 	}
 	
 	/**
