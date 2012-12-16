@@ -3,6 +3,8 @@ import dspComponents.Compressor;
 import dspComponents.Osc;
 import dspComponents.Parameter;
 import dspComponents.Redux;
+import dspComponents.envelopes.Envelope;
+import dspComponents.envelopes.LinearADSEnvelope;
 
 
 /**
@@ -18,6 +20,11 @@ public class Engine {
 	private int sampleRate;
 	private Redux redux1; 
 	
+	public void refresh()
+	{
+		compressor1.refresh();
+	}
+	
 	
 	
 	
@@ -32,8 +39,9 @@ public class Engine {
 		final Parameter<Double> oscWidth = new Parameter<Double> (Double.class, 0.0, 1.0, 0.5, "Width"); 
 		final Parameter<Double> oscSlope = new Parameter<Double> (Double.class, 0.0, 1.0, 0.5, "Slope"); 
 		final Parameter<Double> oscCurve = new Parameter<Double> (Double.class, 0.0, 1.0, 0.5, "Curve"); 
-		final Parameter<Integer> oscFourier = new Parameter<Integer> (Integer.class, 2, 64, 2, "Fourier"); 
-		this.osc1 = new Osc("Oscillator 1", oscAmp, oscFreq, oscPhase, oscCurve, oscWidth, oscSlope, oscFourier);
+		final Parameter<Integer> oscFourier = new Parameter<Integer> (Integer.class, 2, 64, 2, "Fourier");
+		final Envelope oscEnv = new LinearADSEnvelope("Osc1 Envelope", 0.5, 0.5); 
+		this.osc1 = new Osc("Oscillator 1", oscAmp, oscFreq, oscPhase, oscCurve, oscWidth, oscSlope, oscFourier, oscEnv);
 		
 		/*Compressor*/
 		final Parameter<Double> compThreshold = new Parameter<Double>(Double.class, 0.0, 1.0, 1.0, "Threshold");
@@ -59,14 +67,15 @@ public class Engine {
 	
 	/**
 	 * Returns the final outputed value after all DSP has been applied, for a given time value. 
-	 * @param t
+	 * @param t sample number that's passed in.
 	 * @return
 	 */
 	public double getValue(int t)
 	{
+		double time = (double)t/sampleRate; 
 	
-		double value = osc1.getValue((double)t/sampleRate); 
-		value = compressor1.getValue(value);
+		double value = osc1.getValue(time); 
+		value = compressor1.getValue(value, time);
 		value = redux1.getValue(t, value); 
 		return value; 
 	

@@ -1,5 +1,7 @@
 package dspComponents;
 
+import dspComponents.envelopes.Envelope;
+
 
 /**An oscillator component. Generates an amplitude value for a given time value, according to it's set parameters. 
  * @author dave
@@ -22,6 +24,8 @@ public class Osc extends Component {
 	private Parameter<Integer> fourier;
 	private WaveShape waveShape; 
 	
+	private Envelope envelope; 
+	
 	
 	
 	/* constructor sets osc to it's default values*/
@@ -32,7 +36,8 @@ public class Osc extends Component {
 			Parameter<Double> curve, 
 			Parameter<Double> width, 
 			Parameter<Double> slope,
-			Parameter<Integer> fourier)
+			Parameter<Integer> fourier,
+			Envelope envelope)
 	{
 		super(name); 
 		
@@ -45,6 +50,8 @@ public class Osc extends Component {
 		this.fourier =fourier;  
 		
 		this.waveShape = WaveShape.SINE; 
+		
+		this.envelope = envelope; 
 	}
 	
 	/*getter methods*/
@@ -56,6 +63,7 @@ public class Osc extends Component {
 	public Parameter<Double> getSlope() 			{ return this.slope;}
 	public WaveShape getWaveShape()					{ return this.waveShape;}
 	public Parameter<Integer> getFourier() 			{ return this.fourier;}
+	public Envelope getEnvelope()					{ return this.envelope;}
 
 	/*waveShape setter*/
 	public void setWaveShape(WaveShape w)	{ this.waveShape = w; }
@@ -201,6 +209,11 @@ public class Osc extends Component {
 			break; 
 		
 		
+		}
+		
+		if (this.getEnvelope() != null)
+		{
+			value = value * this.getEnvelope().getValue(t); 
 		}
 		
 		return value; 

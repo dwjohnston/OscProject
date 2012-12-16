@@ -28,6 +28,7 @@ import utilities.InnerMethod;
 import dspComponents.Compressor;
 import dspComponents.Osc;
 import dspComponents.Redux;
+import dspComponents.envelopes.LinearADSEnvelope;
 
 
 
@@ -54,14 +55,19 @@ public class Gui extends JFrame implements ActionListener {
 	public  final int GRIDLAYOUT_GAP = 5; 
 
 	private Output displayPanel; 
+	private Engine parentEngine; 
 
 	public void refresh()
 	{
+		parentEngine.refresh();
 		displayPanel.refresh(); 
+		
 	}
 
 	public Gui (String title, Engine engine)
 	{
+		
+		parentEngine = engine; 
 
 		/* create the initial frame*/
 		setTitle(title);
@@ -83,7 +89,8 @@ public class Gui extends JFrame implements ActionListener {
 		outerPanel.add(displayPanel); 
 
 		/*add component panels to control panel*/
-		controlPanel.add(createOscPanel(engine.getOsc1())); 
+		controlPanel.add(createOscPanel(engine.getOsc1()));
+		controlPanel.add(createADSEnvelopePanel((LinearADSEnvelope)engine.getOsc1().getEnvelope())); 
 		controlPanel.add(createCompressorPanel(engine.getCompressor1())); 
 		controlPanel.add(createReduxPanel(engine.getRedux1())); 
 
@@ -96,6 +103,17 @@ public class Gui extends JFrame implements ActionListener {
 		this.setVisible(true); 
 		this.refresh(); 
 
+	}
+	
+	private JPanel createADSEnvelopePanel(final LinearADSEnvelope e)
+	{
+		JPanel panel = new ComponentPanel(e.NAME, 1, 3, this);
+		
+		panel.add(new SliderPanel(e.getAttack(), DEFAULT_SLIDER_GRAINS, this)); 
+		panel.add(new SliderPanel(e.getDecay(), DEFAULT_SLIDER_GRAINS, this)); 
+		panel.add(new SliderPanel(e.getSustain(), DEFAULT_SLIDER_GRAINS, this));
+		
+		return panel; 
 	}
 
 	private JPanel createCompressorPanel(final Compressor c)
