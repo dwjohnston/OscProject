@@ -40,7 +40,7 @@ public class Engine {
 		final Parameter<Double> oscSlope = new Parameter<Double> (Double.class, 0.0, 1.0, 0.5, "Slope"); 
 		final Parameter<Double> oscCurve = new Parameter<Double> (Double.class, 0.0, 1.0, 0.5, "Curve"); 
 		final Parameter<Integer> oscFourier = new Parameter<Integer> (Integer.class, 2, 64, 2, "Fourier");
-		final Envelope oscEnv = new LinearADSEnvelope("Osc1 Envelope", 0.5, 0.5); 
+		final Envelope oscEnv = new LinearADSEnvelope("Osc1 Amplitude Envelope", 0.5, 0.5); 
 		this.osc1 = new Osc("Oscillator 1", oscAmp, oscFreq, oscPhase, oscCurve, oscWidth, oscSlope, oscFourier, oscEnv);
 		
 		/*Compressor*/
