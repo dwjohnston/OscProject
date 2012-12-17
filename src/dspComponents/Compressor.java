@@ -104,7 +104,8 @@ public class Compressor extends Component {
 						
 				}
 				
-				if (triggered)
+				/*attack phase*/ 
+				if (triggered && t < this.getAttack().getValue())
 				{
 					if (Math.abs(v) > max)
 					{
@@ -124,6 +125,7 @@ public class Compressor extends Component {
 					
 					if (debug == 0)
 					{
+						System.out.printf("time since/ attack: %f\n", timeSinceTrigger/this.getAttack().getValue());
 						System.out.printf("time = %f, ratio = %f, ratioToUse = %f\n", t, this.getRatio().getValue(), ratioToUse); 
 						debug = -10; 
 					}
@@ -134,9 +136,35 @@ public class Compressor extends Component {
 					newGain = m2/max;
 					
 					double rValue = newGain * v; 
+									
 					return rValue;
 					
 				}
+				
+				/*sustain phase*/
+				else if (triggered && t>= this.getAttack().getValue())
+				{
+					if (Math.abs(v) > max)
+					{
+						max = Math.abs(v);
+			
+					}	
+			
+					double rValue = v; 
+					double m2 = -1; 
+					if (max> this.getThreshold().getValue())
+					{
+						m2 = (max - this.getThreshold().getValue())/this.getRatio().getValue() + this.getThreshold().getValue();
+						
+						newGain = m2/max;
+			
+						rValue = newGain * v;
+					}
+					
+					
+					return rValue; 
+				}
+				
 				
 				return v; 
 
