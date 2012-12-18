@@ -59,7 +59,7 @@ public class Gui extends JFrame implements ActionListener {
 
 	public void refresh()
 	{
-		parentEngine.refresh();
+		parentEngine.reset();
 		displayPanel.refresh(); 
 		
 	}

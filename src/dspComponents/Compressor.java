@@ -17,6 +17,8 @@ public class Compressor extends Component {
 
 	private Parameter<Double> attack;
 	private Parameter<Double> release; 
+	
+	private EnvelopeFollower envF; 
 
 	public Parameter<Double> getAttack() {return this.attack;}
 	public Parameter<Double> getRelease() {return this.release;}
@@ -31,15 +33,18 @@ public class Compressor extends Component {
 	public Parameter<Double> getThreshold()			{return this.threshold;}
 	public Parameter<Double> getGain() 				{return this.gain; }
 	public  Parameter<Double> getRatio() 				{return this.ratio; }
+	public EnvelopeFollower getEnvF() 				{return this.envF;}
 
-	public void refresh()
+	public void reset()
 	{
 		max = 0; 
 		newGain = 1; 
 		triggerTime = 0; 
 
 		triggered = false;
-		released = false; 
+		released = false;
+		
+		this.getEnvF().reset(); 
 	}
 
 	public Compressor(String name, Parameter<Double> threshold, Parameter<Double> ratio, Parameter<Double> gain, Parameter<Double> attack, Parameter<Double> release)
@@ -50,6 +55,8 @@ public class Compressor extends Component {
 		this.gain = gain;
 		this.attack = attack;
 		this.release = release; 
+		
+		this.envF = new EnvelopeFollower(); 
 	}
 
 

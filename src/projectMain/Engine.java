@@ -20,9 +20,10 @@ public class Engine {
 	private int sampleRate;
 	private Redux redux1; 
 	
-	public void refresh()
+	public void reset()
 	{
-		compressor1.refresh();
+		compressor1.reset();
+		
 	}
 	
 	
