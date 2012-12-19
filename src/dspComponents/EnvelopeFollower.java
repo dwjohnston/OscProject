@@ -25,24 +25,17 @@ public class EnvelopeFollower {
 	{
 		buffer.add(Math.abs(t)); 
 		
-		Iterator<Double> itr = buffer.iterator();
-		
+		Iterator<Double> itr = buffer.iterator();		
 		double max = 0; 
-		double sum = 0;
 		while (itr.hasNext())
 		{
 			double value = itr.next(); 
-			sum += value;
 			
 			if (value> max) max = value; 
 		
 		}
 
-		sum = sum/buffer.size(); 
-		sum = Math.sqrt(sum); 
-
 		return max; 
-		//return sum; 
 		
 	}
 	
