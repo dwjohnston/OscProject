@@ -23,7 +23,7 @@ public class EnvelopeFollower {
 	
 	public double getValue(double t)
 	{
-		buffer.add(t); 
+		buffer.add(Math.abs(t)); 
 		
 		Iterator<Double> itr = buffer.iterator();
 		
