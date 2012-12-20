@@ -77,6 +77,15 @@ public class Output extends JPanel{
 		envy1 = envy2;	
 
 	}
+	
+	private void drawThreshold(Graphics2D g)
+	{
+		g.setColor(Color.blue); 
+		
+		int height = (int)(Gui.OUTPUT_HEIGHT/2 - Gui.OUTPUT_HEIGHT*0.5*engine.getCompressor1().getThreshold().getValue() );
+		g.drawLine(0, height, Gui.OUTPUT_WIDTH, height); 
+		
+	}
 
 	public void paintComponent(Graphics g) {
 		super.paintComponent(g);
@@ -99,6 +108,8 @@ public class Output extends JPanel{
 			drawEnvelope(g2d, i); 
 
 		}
+		drawThreshold(g2d); 
+		
 
 	}
 }

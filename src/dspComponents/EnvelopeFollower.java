@@ -28,9 +28,9 @@ public class EnvelopeFollower {
 		this.reset(); 
 	}
 	
-	public double getValue(double t)
+	public double getValue(double v)
 	{
-		buffer.add(Math.abs(t)); 
+		buffer.add(Math.abs(v)); 
 				
 		Iterator<Double> itr = buffer.iterator();		
 		double max = 0; 
@@ -42,6 +42,8 @@ public class EnvelopeFollower {
 			else max = Math.pow((max*SMOOTHING_MULTIPLIER),  SMOOTHING_EXPONENT); 
 		
 		}
+		
+		/* RMS function to smooth max values*/
 //		maxBuffer.add(max); 
 //		Iterator<Double> maxItr = maxBuffer.iterator();
 //		double sum = 0; 

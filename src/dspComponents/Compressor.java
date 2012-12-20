@@ -17,15 +17,16 @@ public class Compressor extends Component {
 
 	private Parameter<Double> attack;
 	private Parameter<Double> release; 
-	
+
 	private EnvelopeFollower envF; 
 
 	public Parameter<Double> getAttack() {return this.attack;}
 	public Parameter<Double> getRelease() {return this.release;}
 
 	private boolean triggered = false; //whether the attack phase has been triggered or not.
-	private boolean released = false; 
-	private double triggerTime = 0; 
+	private boolean releasing = false; 
+	private double triggerTime = 0;
+	private double releasingTime = 0; 
 	private double max =0;
 	private double newGain = 1;
 
@@ -42,8 +43,8 @@ public class Compressor extends Component {
 		triggerTime = 0; 
 
 		triggered = false;
-		released = false;
-		
+		releasing = false;
+
 		this.getEnvF().reset(); 
 	}
 
@@ -55,7 +56,7 @@ public class Compressor extends Component {
 		this.gain = gain;
 		this.attack = attack;
 		this.release = release; 
-		
+
 		this.envF = new EnvelopeFollower(); 
 	}
 
@@ -74,108 +75,190 @@ public class Compressor extends Component {
 	public double getValue(double v, double t)
 	{
 
-//		if (Math.abs(v) > max)
-//		{
-//			max = Math.abs(v);
-//
-//		}	
-//
-//		double rValue = v; 
-//		double m2 = -1; 
-//		if (max> this.getThreshold().getValue())
-//		{
-//			m2 = (max - this.getThreshold().getValue())/this.getRatio().getValue() + this.getThreshold().getValue();
-//			
-//			newGain = m2/max;
-//
-//			rValue = newGain * v;
-//		}
-//		
-//		if (debug == 0)
-//		{
-//			System.out.println("*******");
-//			System.out.printf("Time = %f, threshold = %f, ratio = %f,   Max = %f, m2 = %f, newGain = %f, rValue = %f\n", t, this.getThreshold().getValue(), this.getRatio().getValue(), max, m2, newGain, rValue);
-//
-//			debug  = -10; 
-//		}
-//		debug++;
-//
-//
-//		return rValue;
+		double vol = this.getEnvF().getValue(v); 
+		double ratioToUse = 1; 
+
+		if (vol > this.getThreshold().getValue())
+		{
+			if (!triggered)
+			{
+				triggered = true;
+				triggerTime = t;
+			}
 
 
-				if (Math.abs(v)>this.getThreshold().getValue() && !triggered)
+
+			if (triggered)
+			{
+				double timeSinceTrigger = t - triggerTime;
+
+				/*attack phase*/
+				if (timeSinceTrigger < this.getAttack().getValue())
 				{
-					triggered =true;
-					triggerTime = t; 
-						
+					ratioToUse = 1+ ((timeSinceTrigger/this.getAttack().getValue())*(this.getRatio().getValue()-1));
 				}
-				
-				/*attack phase*/ 
-				if (triggered && t < this.getAttack().getValue())
-				{
-					if (Math.abs(v) > max)
-					{
-						max = Math.abs(v);
-						
-					}	
-					
-					double timeSinceTrigger = t - triggerTime;
-					double ratioToUse = 0;
-					if (this.getAttack().getValue() !=0)
-					{
-						ratioToUse = 1+ ((timeSinceTrigger/this.getAttack().getValue())*(this.getRatio().getValue()-1));
-					}
-					
-					
-					else ratioToUse = this.getRatio().getValue();
-					
-					if (debug == 0)
-					{
-						System.out.printf("time since/ attack: %f\n", timeSinceTrigger/this.getAttack().getValue());
-						System.out.printf("time = %f, ratio = %f, ratioToUse = %f\n", t, this.getRatio().getValue(), ratioToUse); 
-						debug = -10; 
-					}
-					debug++;
-					
-					
-					double m2 = (max - this.getThreshold().getValue())/ratioToUse + this.getThreshold().getValue();
-					newGain = m2/max;
-					
-					double rValue = newGain * v; 
-									
-					return rValue;
-					
-				}
-				
 				/*sustain phase*/
-				else if (triggered && t>= this.getAttack().getValue())
+				else
 				{
-					if (Math.abs(v) > max)
-					{
-						max = Math.abs(v);
-			
-					}	
-			
-					double rValue = v; 
-					double m2 = -1; 
-					if (max> this.getThreshold().getValue())
-					{
-						m2 = (max - this.getThreshold().getValue())/this.getRatio().getValue() + this.getThreshold().getValue();
-						
-						newGain = m2/max;
-			
-						rValue = newGain * v;
-					}
-					
-					
-					return rValue; 
+					ratioToUse = this.getRatio().getValue(); 
 				}
-				
-				
-				return v; 
+
+			}
+			else 
+			{
+				/*shouldn't occur*/
+			}
 
 
+
+
+
+		}
+
+
+		else 
+		{
+			if (!releasing && triggered) //enter the releasing phase
+			{
+				releasing = true; 
+				releasingTime = t; 
+				triggered = false; 
+
+			}
+
+			if (releasing)
+			{
+
+				double timeSinceReleasing = t - releasingTime; 
+				/*release phase*/
+				if (timeSinceReleasing < this.getRelease().getValue())
+				{
+					ratioToUse = this.getRatio().getValue() + ((1-this.getRelease().getValue())* (timeSinceReleasing/this.getRelease().getValue())) ;
+				}
+
+			}
+
+		}
+
+		if (ratioToUse != 1)
+		{
+
+			double m2 = (vol - this.getThreshold().getValue())/ratioToUse + this.getThreshold().getValue();
+			newGain = m2/vol;
+
+			double rValue = newGain * v; 
+
+			return rValue;
+
+		}
+		else
+		{
+			return v; 
+		}
+
+
+		//		if (Math.abs(v) > max)
+		//		{
+		//			max = Math.abs(v);
+		//
+		//		}	
+		//
+		//		double rValue = v; 
+		//		double m2 = -1; 
+		//		if (max> this.getThreshold().getValue())
+		//		{
+		//			m2 = (max - this.getThreshold().getValue())/this.getRatio().getValue() + this.getThreshold().getValue();
+		//			
+		//			newGain = m2/max;
+		//
+		//			rValue = newGain * v;
+		//		}
+		//		
+		//		if (debug == 0)
+		//		{
+		//			System.out.println("*******");
+		//			System.out.printf("Time = %f, threshold = %f, ratio = %f,   Max = %f, m2 = %f, newGain = %f, rValue = %f\n", t, this.getThreshold().getValue(), this.getRatio().getValue(), max, m2, newGain, rValue);
+		//
+		//			debug  = -10; 
+		//		}
+		//		debug++;
+		//
+		//
+		//		return rValue;
+
+
+		//				if (Math.abs(v)>this.getThreshold().getValue() && !triggered)
+		//				{
+		//					triggered =true;
+		//					triggerTime = t; 
+		//						
+		//				}
+		//				
+		//				/*attack phase*/ 
+		//				if (triggered && t < this.getAttack().getValue())
+		//				{
+		//					if (Math.abs(v) > max)
+		//					{
+		//						max = Math.abs(v);
+		//						
+		//					}	
+		//					
+		//					double timeSinceTrigger = t - triggerTime;
+		//					double ratioToUse = 0;
+		//					if (this.getAttack().getValue() !=0)
+		//					{
+		//						ratioToUse = 1+ ((timeSinceTrigger/this.getAttack().getValue())*(this.getRatio().getValue()-1));
+		//					}
+		//					
+		//					
+		//					else ratioToUse = this.getRatio().getValue();
+		//					
+		//					if (debug == 0)
+		//					{
+		//						System.out.printf("time since/ attack: %f\n", timeSinceTrigger/this.getAttack().getValue());
+		//						System.out.printf("time = %f, ratio = %f, ratioToUse = %f\n", t, this.getRatio().getValue(), ratioToUse); 
+		//						debug = -10; 
+		//					}
+		//					debug++;
+		//					
+		//					
+		//					double m2 = (max - this.getThreshold().getValue())/ratioToUse + this.getThreshold().getValue();
+		//					newGain = m2/max;
+		//					
+		//					double rValue = newGain * v; 
+		//									
+		//					return rValue;
+		//					
+		//				}
+		//				
+		//				/*sustain phase*/
+		//				else if (triggered && t>= this.getAttack().getValue())
+		//				{
+		//					if (Math.abs(v) > max)
+		//					{
+		//						max = Math.abs(v);
+		//			
+		//					}	
+		//			
+		//					double rValue = v; 
+		//					double m2 = -1; 
+		//					if (max> this.getThreshold().getValue())
+		//					{
+		//						m2 = (max - this.getThreshold().getValue())/this.getRatio().getValue() + this.getThreshold().getValue();
+		//						
+		//						newGain = m2/max;
+		//			
+		//						rValue = newGain * v;
+		//					}
+		//					
+		//					
+		//					return rValue; 
+		//				}
+		//				
+		//				
+		//				return v; 
+		//
+		//
 
 
 
